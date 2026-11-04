@@ -5,6 +5,7 @@ using PrimeVideoApp.Data;
 using PrimeVideoApp.Hubs;
 using PrimeVideoApp.Models;
 using PrimeVideoApp.ViewModels;
+using PrimeVideoApp.Workers;
 
 namespace PrimeVideoApp.Controllers;
 
@@ -14,11 +15,16 @@ public class ContentController : Controller
     private const string IdLockKey = "SELECT pg_advisory_xact_lock(492817)";
     private readonly PrimeVideoDbContext _db;
     private readonly IHubContext<ContentHub> _hub;
+    private readonly ContentStatsWorker _statsWorker;
 
-    public ContentController(PrimeVideoDbContext db, IHubContext<ContentHub> hub)
+    public ContentController(
+        PrimeVideoDbContext db,
+        IHubContext<ContentHub> hub,
+        ContentStatsWorker statsWorker)
     {
         _db = db;
         _hub = hub;
+        _statsWorker = statsWorker;
     }
 
     public async Task<IActionResult> Index(string? q, string? type, int page = 1)
@@ -80,6 +86,27 @@ public class ContentController : Controller
             PageSize = PageSize,
             TotalItems = totalItems
         };
+    }
+
+    [HttpGet]
+    public IActionResult Stats()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult StartStats()
+    {
+        var jobId = _statsWorker.Enqueue();
+        return Accepted(new { jobId, requestThreadId = Environment.CurrentManagedThreadId });
+    }
+
+    [HttpGet]
+    public IActionResult StatsStatus(string id)
+    {
+        var snapshot = _statsWorker.GetJob(id);
+        return snapshot is null ? NotFound() : Json(snapshot);
     }
 
     [HttpGet]

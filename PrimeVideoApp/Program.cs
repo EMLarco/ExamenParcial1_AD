@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PrimeVideoApp.Data;
 using PrimeVideoApp.Hubs;
+using PrimeVideoApp.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,9 @@ builder.Services.AddDbContext<PrimeVideoDbContext>(options =>
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<ContentStatsWorker>();
+builder.Services.AddHostedService(serviceProvider =>
+    serviceProvider.GetRequiredService<ContentStatsWorker>());
 
 var app = builder.Build();
 

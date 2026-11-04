@@ -1,0 +1,36 @@
+@{
+    ViewData["Title"] = "Estadísticas";
+}
+
+<h1>Procesamiento con Worker Thread</h1>
+
+<p>
+    El procesamiento se ejecuta en un hilo independiente. La aplicación sigue disponible
+    para listar, registrar, editar o eliminar contenidos mientras se calculan las estadísticas.
+</p>
+
+<div id="statsApp" data-start-url="@Url.Action("StartStats", "Content")"
+     data-status-url="@Url.Action("StatsStatus", "Content")">
+    @Html.AntiForgeryToken()
+
+    <p>
+        <button id="startStatsButton" type="button" class="btn btn-primary">Iniciar procesamiento</button>
+        <a asp-action="Index" class="btn btn-secondary">Volver a contenidos</a>
+    </p>
+
+    <div id="statsStatus" class="d-none">
+        <p id="statsMessage" class="mb-2"></p>
+        <div class="progress mb-2" role="progressbar" aria-label="Progreso del procesamiento"
+             aria-valuemin="0" aria-valuemax="100">
+            <div id="statsProgressBar" class="progress-bar" style="width: 0%">0%</div>
+        </div>
+        <p id="statsThread" class="text-muted small"></p>
+    </div>
+
+    <div id="statsError" class="alert alert-danger d-none" role="alert"></div>
+    <div id="statsResults"></div>
+</div>
+
+@section Scripts {
+    <script src="~/js/content-stats.js" asp-append-version="true"></script>
+}
