@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PrimeVideoApp.Data;
+using PrimeVideoApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.Services.AddDbContext<PrimeVideoDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -30,5 +32,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Content}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+app.MapHub<ContentHub>("/contentHub");
 
 app.Run();

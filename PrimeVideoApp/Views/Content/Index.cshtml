@@ -1,33 +1,6 @@
 @model ContentListViewModel
 @{
     ViewData["Title"] = "Contenidos";
-
-    string TypeLabel(string type) => type switch
-    {
-        "MOVIE" => "Película",
-        "TV_SHOW" => "Serie",
-        _ => "Otro"
-    };
-
-    string DurationLabel(Content content)
-    {
-        if (!string.IsNullOrWhiteSpace(content.DurationText))
-        {
-            return content.DurationText;
-        }
-
-        if (content.DurationValue is null)
-        {
-            return "Sin duración";
-        }
-
-        return content.DurationUnit switch
-        {
-            "MINUTES" => $"{content.DurationValue} min",
-            "SEASONS" => $"{content.DurationValue} temporada(s)",
-            _ => content.DurationValue.ToString()!
-        };
-    }
 }
 
 <h1>Contenidos</h1>
@@ -64,71 +37,14 @@
     </div>
 </form>
 
-<p>Total de contenidos: <strong>@Model.TotalItems.ToString("N0")</strong></p>
+<p id="realtime-status" class="text-muted small">Conectando al canal en tiempo real...</p>
+<div id="realtime-alert" class="alert alert-info d-none" role="alert"></div>
 
-@if (Model.Items.Count == 0)
-{
-    <div class="alert alert-warning">No se encontraron contenidos.</div>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Título</th>
-                    <th>Tipo</th>
-                    <th>Año</th>
-                    <th>Duración</th>
-                    <th>Clasificación</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Items)
-                {
-                    <tr>
-                        <td>@item.Id</td>
-                        <td>@item.Title</td>
-                        <td>@TypeLabel(item.ContentType)</td>
-                        <td>@(item.ReleaseYear?.ToString() ?? "-")</td>
-                        <td>@DurationLabel(item)</td>
-                        <td>@(string.IsNullOrWhiteSpace(item.Rating) ? "-" : item.Rating)</td>
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Editar</a>
-                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Eliminar</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+<div id="contentResults" data-results-url="@Url.Action("Results", "Content")">
+    <partial name="_ContentList" model="Model" />
+</div>
 
-    <p>Mostrando @(((Model.Page - 1) * Model.PageSize) + 1) a
-        @Math.Min(Model.Page * Model.PageSize, Model.TotalItems) de @Model.TotalItems.ToString("N0") registros.
-    </p>
-
-    @if (Model.TotalPages > 1)
-    {
-        <nav aria-label="Paginación de contenidos">
-            <ul class="pagination">
-                <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page - 1)"
-                       asp-route-q="@Model.Search" asp-route-type="@Model.ContentType">Anterior</a>
-                </li>
-                @for (var pageNumber = Model.StartPage; pageNumber <= Model.EndPage; pageNumber++)
-                {
-                    <li class="page-item @(pageNumber == Model.Page ? "active" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-page="@pageNumber"
-                           asp-route-q="@Model.Search" asp-route-type="@Model.ContentType">@pageNumber</a>
-                    </li>
-                }
-                <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)"
-                       asp-route-q="@Model.Search" asp-route-type="@Model.ContentType">Siguiente</a>
-                </li>
-            </ul>
-        </nav>
-    }
+@section Scripts {
+    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+    <script src="~/js/content-realtime.js" asp-append-version="true"></script>
 }
