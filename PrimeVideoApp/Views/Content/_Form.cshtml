@@ -1,0 +1,75 @@
+@model ContentFormViewModel
+
+<form asp-controller="Content" asp-action="@(ViewData["FormAction"] as string)" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="ContentType" class="form-label"></label>
+            <select asp-for="ContentType" class="form-select"
+                    asp-items="@(new SelectList(ContentFormViewModel.ContentTypes, Model.ContentType))">
+                <option value="">Selecciona un tipo</option>
+            </select>
+            <span asp-validation-for="ContentType" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="ReleaseYear" class="form-label"></label>
+            <input asp-for="ReleaseYear" class="form-control" />
+            <span asp-validation-for="ReleaseYear" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="DateAdded" class="form-label"></label>
+            <input asp-for="DateAdded" class="form-control" />
+            <span asp-validation-for="DateAdded" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="Rating" class="form-label"></label>
+            <input asp-for="Rating" class="form-control" />
+            <span asp-validation-for="Rating" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="DurationValue" class="form-label"></label>
+            <input asp-for="DurationValue" class="form-control" />
+            <span asp-validation-for="DurationValue" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="DurationUnit" class="form-label"></label>
+            <select asp-for="DurationUnit" class="form-select">
+                <option value="">Sin unidad</option>
+                @foreach (var unit in ContentFormViewModel.DurationUnits)
+                {
+                    <option value="@unit" selected="@(Model.DurationUnit == unit)">@unit</option>
+                }
+            </select>
+            <span asp-validation-for="DurationUnit" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="DurationText" class="form-label"></label>
+            <input asp-for="DurationText" class="form-control" />
+            <span asp-validation-for="DurationText" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

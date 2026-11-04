@@ -1,0 +1,43 @@
+@model Content
+@{
+    ViewData["Title"] = "Eliminar contenido";
+
+    var typeLabel = Model.ContentType switch
+    {
+        "MOVIE" => "Película",
+        "TV_SHOW" => "Serie",
+        _ => "Otro"
+    };
+}
+
+<h1>Eliminar contenido</h1>
+
+<div class="alert alert-danger">¿Está seguro de que desea eliminar este contenido?</div>
+
+<dl class="row">
+    <dt class="col-sm-3">ID</dt>
+    <dd class="col-sm-9">@Model.Id</dd>
+
+    <dt class="col-sm-3">Título</dt>
+    <dd class="col-sm-9">@Model.Title</dd>
+
+    <dt class="col-sm-3">Tipo</dt>
+    <dd class="col-sm-9">@typeLabel</dd>
+
+    <dt class="col-sm-3">Año</dt>
+    <dd class="col-sm-9">@(Model.ReleaseYear?.ToString() ?? "-")</dd>
+
+    <dt class="col-sm-3">Clasificación</dt>
+    <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Rating) ? "-" : Model.Rating)</dd>
+
+    <dt class="col-sm-3">Duración</dt>
+    <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.DurationText) ? "-" : Model.DurationText)</dd>
+
+    <dt class="col-sm-3">Descripción</dt>
+    <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Description) ? "-" : Model.Description)</dd>
+</dl>
+
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
